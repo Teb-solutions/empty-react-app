@@ -1,9 +1,10 @@
 trigger:
 - main  # Runs when code is pushed to the 'main' branch
 
+#pool:
+#  vmImage: ubuntu-latest  # Build on a Linux agent
 pool:
-  vmImage: ubuntu-latest  # Build on a Linux agent
-
+  vmImage: windows-latest  # Change from 'ubuntu-latest' to 'windows-latest'
 variables:
   vmName: "52.183.159.4"
   vmAdmin: "toi_ri_admin"
@@ -62,13 +63,13 @@ steps:
       $artifactPath = "$(Build.ArtifactStagingDirectory)\drop\app.zip"
       $deployPath = "$(targetPath)"
       
-      Write-Host "Stopping IIS..."
-      Stop-Service -Name W3SVC -Force
+      #Write-Host "Stopping IIS..."
+      #Stop-Service -Name W3SVC -Force
       
       Write-Host "Extracting application files..."
       Expand-Archive -Path $artifactPath -DestinationPath $deployPath -Force
 
-      Write-Host "Starting IIS..."
-      Start-Service -Name W3SVC
+      #Write-Host "Starting IIS..."
+      #Start-Service -Name W3SVC
 
       Write-Host "Deployment completed successfully!"
