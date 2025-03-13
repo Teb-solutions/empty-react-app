@@ -62,7 +62,23 @@ steps:
     inlineScript: |
       $artifactPath = "$(Build.ArtifactStagingDirectory)\drop\app.zip"
       $deployPath = "$(targetPath)"
+
+      $siteName = "testsitecicd"
+      $artifactPath = "$(Build.ArtifactStagingDirectory)\drop\app.zip"
+      $deployPath = "$(targetPath)"
       
+      Write-Host "Stopping only $siteName..."
+      Stop-WebSite -Name $siteName
+      
+      Write-Host "Cleaning up old files..."
+      Remove-Item -Path "$deployPath\*" -Recurse -Force
+      
+      Write-Host "Extracting application files..."
+      Expand-Archive -Path $artifactPath -DestinationPath $deployPath -Force
+      
+      Write-Host "Starting $siteName..."
+      Start-WebSite -Name $siteName
+      #----
       #Write-Host "Stopping IIS..."
       #Stop-Service -Name W3SVC -Force
       
