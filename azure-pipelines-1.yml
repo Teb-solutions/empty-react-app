@@ -42,11 +42,12 @@ steps:
     artifactName: 'drop'
 
 # Step 6: Deploy to IIS on Azure VM
+
 - task: PowerShellOnTargetMachines@3
   displayName: 'Deploy to IIS'
   inputs:
-    Machines: '$(vmName)'
-    AdminUserName: '$(vmAdmin)'
+    Machines: '$(VM_IP)'
+    AdminUserName: 'toi_ri_admin'
     AdminPassword: '$(vmPassword)'
     protocol: 'WinRM'
     scriptPath: ''
