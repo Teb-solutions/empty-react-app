@@ -46,9 +46,9 @@ steps:
 - task: PowerShellOnTargetMachines@3
   displayName: 'Deploy to IIS'
   inputs:
-    Machines: '$(VM_IP)'
+    Machines: '52.183.159.4'
     AdminUserName: 'toi_ri_admin'
-    AdminPassword: '$(vmPassword)'
+    AdminPassword: 'escalation2025!!'
     protocol: 'WinRM'
     scriptPath: ''
     inlineScript: |
