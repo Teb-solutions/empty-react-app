@@ -20,9 +20,15 @@ steps:
   displayName: 'Install Dependencies'
 
 # Step 3: Build the React App
+#- script: |
+#    npm run build
+#  displayName: 'Build React App'
+
 - script: |
     npm run build
-  displayName: 'Build React App'
+    echo "Checking contents of $(Build.SourcesDirectory)..."
+    ls -la $(Build.SourcesDirectory)
+  displayName: 'Build React App and Verify Output'
 
 # Step 4: Archive the Build Folder
 - task: ArchiveFiles@2
