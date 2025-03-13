@@ -1,19 +1,66 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+- main  # Runs when code is pushed to the 'main' branch
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: ubuntu-latest  # Build on a Linux agent
+
+variables:
+  vmName: "$(VM_IP)"
+  vmAdmin: "toi_ri_admin"
+  vmPassword: "$(vmPassword)"  # Use Azure DevOps secrets
+  targetPath: "C:\\inetpub\\testsitecicd"  # Deployment folder on IIS
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# Step 1: Checkout Code from GitHub
+- checkout: self
 
+# Step 2: Install Dependencies
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    npm install
+  displayName: 'Install Dependencies'
+
+# Step 3: Build the React App
+- script: |
+    npm run build
+  displayName: 'Build React App'
+
+# Step 4: Archive the Build Folder
+- task: ArchiveFiles@2
+  displayName: 'Archive Build Output'
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)/build'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+    replaceExistingArchive: true
+
+# Step 5: Publish Build Artifacts
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)/app.zip'
+    artifactName: 'drop'
+
+# Step 6: Deploy to IIS on Azure VM
+- task: PowerShellOnTargetMachines@3
+  displayName: 'Deploy to IIS'
+  inputs:
+    Machines: '$(vmName)'
+    AdminUserName: '$(vmAdmin)'
+    AdminPassword: '$(vmPassword)'
+    protocol: 'WinRM'
+    scriptPath: ''
+    inlineScript: |
+      $artifactPath = "$(Build.ArtifactStagingDirectory)\drop\app.zip"
+      $deployPath = "$(targetPath)"
+      
+      Write-Host "Stopping IIS..."
+      Stop-Service -Name W3SVC -Force
+      
+      Write-Host "Extracting application files..."
+      Expand-Archive -Path $artifactPath -DestinationPath $deployPath -Force
+
+      Write-Host "Starting IIS..."
+      Start-Service -Name W3SVC
+
+      Write-Host "Deployment completed successfully!"
