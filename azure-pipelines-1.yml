@@ -5,9 +5,9 @@ pool:
   vmImage: ubuntu-latest  # Build on a Linux agent
 
 variables:
-  vmName: "$(VM_IP)"
+  vmName: "52.183.159.4"
   vmAdmin: "toi_ri_admin"
-  vmPassword: "$(vmPassword)"  # Use Azure DevOps secrets
+  vmPassword: "escalation2025!!"  # Use Azure DevOps secrets
   targetPath: "C:\\inetpub\\testsitecicd"  # Deployment folder on IIS
 
 steps:
